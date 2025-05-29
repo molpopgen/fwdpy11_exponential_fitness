@@ -1,0 +1,33 @@
+[build-system]
+# We need setup.cfg support, which setuptools indtroduced in 30.3.0.
+requires = [
+    "scikit-build-core==0.11.1",
+    "setuptools_scm==7.1.0",
+# We need the fwdpy11 headers so
+# we gotta install it
+    "fwdpy11 == 0.24.5"
+# Pin to the pybind11 required to
+# build our pinned fwdpy11 version
+    "pybind11[global]==2.12.0",
+    "numpy >= 2.0",
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "fwdpy11_exponential_fitness"
+authors = [
+    {name = "Kevin R. Thornton", email =  "krthornt@uci.edu"}
+]
+license = {text = "GNU GPL3+"}
+description = "Exponential fitness model for fwdpy11"
+readme = {file = "README.rst", content-type = "text/x-rst"}
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+]
+dynamic = ["version"]
+dependencies = [
+    "fwdpy11 == 0.24.5"
+]
+requires-python = ">=3.10, <3.14"
