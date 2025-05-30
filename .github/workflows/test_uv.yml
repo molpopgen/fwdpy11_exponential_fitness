@@ -1,0 +1,70 @@
+name: Test using uv
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    name: Set up with uv and run tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python: [ "3.12", "3.13" ]
+        os:  [ ubuntu-24.04 ]
+        compiler: [gcc]
+        rust: [1.62.1]
+
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up rust
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - name: Install cbindgen
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: cbindgen
+          version: "=0.24.3" 
+
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          activate-environment: true
+          version: "latest"
+          python-version: ${{ matrix.python }}
+
+      - name: Install apt dependencies
+        run: |
+            sudo apt update
+            sudo apt install --fix-missing -y libgsl-dev 
+
+      - name: Install python dependencies
+        run: |
+          # We need to build the C++ test suite, etc., so
+          # we don't let uv install the project (b/c the other
+          # stuff isn't built in that case)
+          uv pip install -p ${{ matrix.python }} --group dev -r pyproject.toml
+
+      - name: Install package
+        run: |
+          uv pip install -e .
+
+      - name: Run Python tests
+        run: |
+          python -m pytest tests
