@@ -59,7 +59,7 @@ jobs:
           # We need to build the C++ test suite, etc., so
           # we don't let uv install the project (b/c the other
           # stuff isn't built in that case)
-          python -m pip install --group dev -r pyproject.toml --no-binary fwdpy11
+          python -m pip install .[dev] --no-binary fwdpy11
 
       - name: Install package
         run: |
