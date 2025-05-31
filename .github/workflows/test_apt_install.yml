@@ -52,7 +52,7 @@ jobs:
       - name: Install apt dependencies
         run: |
             sudo apt update
-            sudo apt install --fix-missing -y libgsl-dev cargo rustup
+            sudo apt install --fix-missing -y libgsl-dev rustup
 
       - name: Install python dependencies
         run: |
