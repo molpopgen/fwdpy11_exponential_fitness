@@ -52,3 +52,27 @@ def test_via_simulation():
     fwdpy11.evolvets(
         rng, pop, params, simplification_interval=100, recorder=ManualCalculation()
     )
+
+
+def test_via_simulation_mixed_effect_size_signs():
+    demog = fwdpy11.ForwardDemesGraph.tubes([1000], burnin=1)
+
+    pdict = {
+        "gvalue": fwdpy11_exponential_fitness.ExponentialFitness(2.0),
+        "demography": demog,
+        "sregions": [
+            fwdpy11.ExpS(0.0, 1000.0, 1.0, -1e-2, h=0.25),
+            fwdpy11.ExpS(0.0, 1000.0, 1.0, 1e-3, h=1.0),
+        ],
+        "nregions": [],
+        "recregions": [fwdpy11.PoissonInterval(0.0, 1000.0, 1e-3)],
+        "rates": (0.0, 1e-2, None),
+        "prune_selected": True,
+        "simlen": 10,
+    }
+    params = fwdpy11.ModelParams(**pdict)
+    pop = fwdpy11.DiploidPopulation(demog.initial_sizes, 1000.0)
+    rng = fwdpy11.GSLrng(8654123)
+    fwdpy11.evolvets(
+        rng, pop, params, simplification_interval=100, recorder=ManualCalculation()
+    )
