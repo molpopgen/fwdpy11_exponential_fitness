@@ -1,0 +1,55 @@
+name: Test using apt
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    name: Set up with apt and run tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:  [ ubuntu-24.04 ]
+        compiler: [gcc]
+
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install apt dependencies
+        # We assume that g++ and gcc are already installed.
+        # If you are already a rust user, do not install rustup.
+        run: |
+            sudo apt update
+            sudo apt install --fix-missing -y libgsl-dev rustup python3-dev
+
+      - name: Install rust command-line dependencies
+        run: |
+          # This is the same version that fwdpy11 is built
+          # with for distribution.  The --locked
+          # means to respect any dependency pinnings for cbindgen
+          cargo install cbindgen@0.24.3 --locked
+
+      - name: Install package and python dependencies
+        run: |
+          # In practice this should be done into a venv!
+          # NOTE: this command does an editable install (-e)
+          # and installs pytest via the optional dev dependency list.
+          # We do this b/c we need to run the tests during CI.
+          # However, do NOT do this for installation into a
+          # venv when installing for "research".
+          python -m pip install -e '.[dev]' --no-binary fwdpy11
+
+      - name: Run Python tests
+        run: |
+          python -m pytest tests
