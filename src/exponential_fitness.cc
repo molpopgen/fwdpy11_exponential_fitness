@@ -20,7 +20,7 @@ class ll_ExponentialFitness : public fwdpy11::DiploidGeneticValue
     double
     calculate_gvalue(const fwdpy11::DiploidGeneticValueData data) override final
     {
-        auto pop = data.pop.get();
+        auto &pop = data.pop.get();
         auto label = data.offspring_metadata.get().label;
         auto a = this->additive(pop.haploid_genomes[pop.diploids[label].first],
                                 pop.haploid_genomes[pop.diploids[label].second],
